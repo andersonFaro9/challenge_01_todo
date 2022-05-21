@@ -1,28 +1,40 @@
-import React from 'react';
-import { FlatList, Image, TouchableOpacity, View, Text, StyleSheet, FlatListProps } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import React from 'react'
+import {
+  FlatList,
+  Image,
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  FlatListProps,
+} from 'react-native'
+import Icon from 'react-native-vector-icons/Feather'
 
-import { ItemWrapper } from './ItemWrapper';
+import { ItemWrapper } from './ItemWrapper'
 
 import trashIcon from '../assets/icons/trash/trash.png'
 
 export interface Task {
-  id: number;
-  title: string;
-  done: boolean;
+  id: number
+  title: string
+  done: boolean
 }
 
 interface TasksListProps {
-  tasks: Task[];
-  toggleTaskDone: (id: number) => void;
-  removeTask: (id: number) => void;
+  tasks: Task[]
+  toggleTaskDone: (id: number) => void
+  removeTask: (id: number) => void
 }
 
-export function TasksList({ tasks, toggleTaskDone, removeTask }: TasksListProps) {
+export function TasksList({
+  tasks,
+  toggleTaskDone,
+  removeTask,
+}: TasksListProps) {
   return (
     <FlatList
-      // data={tasks}
-      keyExtractor={item => String(item.id)}
+      data={tasks}
+      keyExtractor={(item) => String(item.id)}
       contentContainerStyle={{ paddingBottom: 24 }}
       showsVerticalScrollIndicator={false}
       renderItem={({ item, index }) => {
@@ -33,23 +45,26 @@ export function TasksList({ tasks, toggleTaskDone, removeTask }: TasksListProps)
                 testID={`button-${index}`}
                 activeOpacity={0.7}
                 style={styles.taskButton}
+                onPress={() => toggleTaskDone(item.id)}
                 //TODO - use onPress (toggle task) prop
               >
-                <View 
+                <View
                   testID={`marker-${index}`}
-                  //TODO - use style prop 
+                  //TODO - use style prop
+                  style={
+                    item.done === true
+                      ? styles.taskMarkerDone
+                      : styles.taskMarker
+                  }
                 >
-                  { item.done && (
-                    <Icon 
-                      name="check"
-                      size={12}
-                      color="#FFF"
-                    />
-                  )}
+                  {item.done && <Icon name='check' size={12} color='#FFF' />}
                 </View>
 
-                <Text 
+                <Text
                   //TODO - use style prop
+                  style={
+                    item.done === true ? styles.taskTextDone : styles.taskText
+                  }
                 >
                   {item.title}
                 </Text>
@@ -59,6 +74,7 @@ export function TasksList({ tasks, toggleTaskDone, removeTask }: TasksListProps)
             <TouchableOpacity
               testID={`trash-${index}`}
               style={{ paddingHorizontal: 24 }}
+              onPress={() => removeTask(item.id)}
               //TODO - use onPress (remove task) prop
             >
               <Image source={trashIcon} />
@@ -67,7 +83,7 @@ export function TasksList({ tasks, toggleTaskDone, removeTask }: TasksListProps)
         )
       }}
       style={{
-        marginTop: 32
+        marginTop: 32,
       }}
     />
   )
@@ -81,7 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     borderRadius: 4,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   taskMarker: {
     height: 16,
@@ -91,11 +107,11 @@ const styles = StyleSheet.create({
     borderColor: '#B2B2B2',
     marginRight: 15,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   taskText: {
     color: '#666',
-    fontFamily: 'Inter-Medium'
+    fontFamily: 'Inter-Medium',
   },
   taskMarkerDone: {
     height: 16,
@@ -104,11 +120,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#1DB863',
     marginRight: 15,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   taskTextDone: {
     color: '#1DB863',
     textDecorationLine: 'line-through',
-    fontFamily: 'Inter-Medium'
-  }
+    fontFamily: 'Inter-Medium',
+  },
 })
