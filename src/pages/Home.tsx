@@ -44,47 +44,46 @@ export function Home() {
     foundItem.title = newTitle
 
     setTasks(updatedTasks)
+  }
+  function handleRemoveTask(id: number) {
+    const taskCancel = tasks.filter((task) => task.id !== id)
 
-    function handleRemoveTask(id: number) {
-      const taskCancel = tasks.filter((task) => task.id !== id)
-
-      return Alert.alert(
-        'Remover item',
-        'Tem certeza que você deseja remover esse item?',
-        [
-          { style: 'cancel', text: 'não', onPress: () => {} },
-          {
-            text: 'sim',
-            onPress: () => {
-              setTasks(taskCancel)
-            },
+    return Alert.alert(
+      'Remover item',
+      'Tem certeza que você deseja remover esse item?',
+      [
+        { style: 'cancel', text: 'não', onPress: () => {} },
+        {
+          text: 'sim',
+          onPress: () => {
+            setTasks(taskCancel)
           },
-        ]
-      )
-    }
-
-    return (
-      <>
-        <View style={styles.container}>
-          <Header tasksCounter={tasks.length} />
-
-          <TodoInput addTask={handleAddTask} />
-
-          <TasksList
-            tasks={tasks}
-            toggleTaskDone={handleToggleTaskDone}
-            removeTask={handleRemoveTask}
-            editTask={handleEditTask}
-          />
-        </View>
-      </>
+        },
+      ]
     )
   }
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#EBEBEB',
-    },
-  })
+  return (
+    <>
+      <View style={styles.container}>
+        <Header tasksCounter={tasks.length} />
+
+        <TodoInput addTask={handleAddTask} />
+
+        <TasksList
+          tasks={tasks}
+          toggleTaskDone={handleToggleTaskDone}
+          removeTask={handleRemoveTask}
+          editTask={handleEditTask}
+        />
+      </View>
+    </>
+  )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#EBEBEB',
+  },
+})

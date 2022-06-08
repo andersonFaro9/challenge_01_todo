@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Task } from './TasksList'
 import { INewTitle } from '../pages/Home'
 import trashIcon from '../assets/icons/trash/trash.png'
+import editIcon from '../assets/icons/edit/edit.png'
 import Icon from 'react-native-vector-icons/Feather'
 import {
   Image,
   TouchableOpacity,
   View,
-  Text,
+  TextInput,
   StyleSheet,
-  FlatListProps,
 } from 'react-native'
 
 interface TaskItemProps {
@@ -24,50 +24,115 @@ export function TaskItem({
   removeTask,
   toggleTaskDone,
 }: TaskItemProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [taskNewTitleValue, setTaskNewTitleValue] = useState(task.title)
+  const textInputRef = useRef<TextInput>(null)
+
+  const handleStartEditing = () => {
+    setIsEditing(true)
+  }
+
+  const handleCancelEditing = () => {
+    setTaskNewTitleValue(task.title)
+    setIsEditing(false)
+  }
+
+  const handleSubmitEditing = () => {
+    editTask({ taskId: task.id, newTitle: taskNewTitleValue })
+  }
+
+  useEffect(() => {
+    if (textInputRef.current) {
+      if (isEditing) {
+        textInputRef.current.focus()
+      } else {
+        textInputRef.current.blur()
+      }
+    }
+  }, [isEditing])
+
   return (
     <>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.taskButton}
-          onPress={() => toggleTaskDone(task.id)}
-        >
-          <View
-            style={
-              task.done === true ? styles.taskMarkerDone : styles.taskMarker
-            }
+      <View style={styles.container}>
+        <View style={styles.infoContainer}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.taskButton}
+            onPress={() => toggleTaskDone(task.id)}
           >
-            {task.done && <Icon name='check' size={12} color='#FFF' />}
-          </View>
+            <View
+              style={
+                task.done === true ? styles.taskMarkerDone : styles.taskMarker
+              }
+            >
+              {task.done && <Icon name='check' size={12} color='#FFF' />}
+            </View>
 
-          <Text
-            //TODO - use style prop
-            style={task.done === true ? styles.taskTextDone : styles.taskText}
+            <TextInput
+              value={taskNewTitleValue}
+              onChangeText={setTaskNewTitleValue}
+              editable={isEditing}
+              onSubmitEditing={handleSubmitEditing}
+              style={task.done === true ? styles.taskTextDone : styles.taskText}
+              ref={textInputRef}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.iconsContainer}>
+          {isEditing ? (
+            <TouchableOpacity onPress={() => handleCancelEditing()}>
+              <Icon name='x' size={24} color='#b2b2' />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => handleStartEditing()}>
+              <Image source={editIcon} />
+            </TouchableOpacity>
+          )}
+
+          <View style={styles.iconsDivider} />
+          <TouchableOpacity
+            onPress={() => removeTask(task.id)}
+            disabled={isEditing}
           >
-            {task.title}
-          </Text>
-        </TouchableOpacity>
+            <Image
+              source={trashIcon}
+              style={{ opacity: isEditing ? 0.2 : 1 }}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity
-        style={{ paddingHorizontal: 24 }}
-        onPress={() => removeTask(task.id)}
-      >
-        <Image source={trashIcon} />
-      </TouchableOpacity>
     </>
   )
 }
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  infoContainer: {
+    flex: 1,
+  },
+
+  iconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: 12,
+    paddingRight: 24,
+  },
+  iconsDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: 'rgba(196, 196, 196, 0.24)',
+    marginHorizontal: 12,
+  },
+
   taskButton: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingVertical: 15,
+    // paddingVertical: 15,
     marginBottom: 4,
     borderRadius: 4,
     flexDirection: 'row',
